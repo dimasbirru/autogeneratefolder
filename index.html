@@ -1,0 +1,130 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto Rangkai Folder Tugas</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Auto Rangkai Folder Tugas</h1>
+    <p>Nama Folder Utama:</p>
+    <input id="mainFolder" type="text" placeholder="Contoh: Semester 5" />
+
+    <p>Masukkan mata kuliah (satu per baris):</p>
+
+    <textarea id="courseInput" placeholder="Pemweb\nBasis Data\nJarkom"></textarea>
+
+    <h3>Template Folder</h3>
+    <div id="templateList"></div>
+
+    <button id="addTemplate">Tambah Folder Template</button>
+    <button id="generateZip">Generate ZIP</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+<!-- style.css -->
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f3f3;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+}
+
+button {
+  margin-top: 15px;
+  margin-right: 10px;
+  padding: 10px 15px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background: #007bff;
+  color: white;
+}
+
+.templateItem {
+  display: flex;
+  justify-content: space-between;
+  background: #eaeaea;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+</style>
+
+<!-- script.js -->
+<script>
+let templates = ["Tugas", "Catatan", "Materi", "UTS", "UAS"]; // default template
+
+function renderTemplates() {
+  const container = document.getElementById("templateList");
+  container.innerHTML = "";
+
+  templates.forEach((t, i) => {
+    container.innerHTML += `
+      <div class="templateItem">
+        <span>${t}</span>
+        <button onclick="removeTemplate(${i})">Hapus</button>
+      </div>
+    `;
+  });
+}
+
+function removeTemplate(i) {
+  templates.splice(i, 1);
+  renderTemplates();
+}
+
+document.getElementById("addTemplate").onclick = () => {
+  const name = prompt("Nama folder template?");
+  if (name) templates.push(name);
+  renderTemplates();
+};
+
+// Auto-generate ZIP when user finishes input (on blur)
+document.getElementById("courseInput").addEventListener("blur", generateZip);
+
+function generateZip() {
+  const input = document.getElementById("courseInput").value.trim();
+  if (!input) return;
+
+  const courses = input.split(/\n+/);
+
+  const zip = new JSZip();
+  const mainName = document.getElementById("mainFolder").value.trim() || "Semester-Folder";
+  const root = zip.folder(mainName);(mainName);
+
+  courses.forEach((c) => {
+    const folder = root.folder(c);
+    templates.forEach((t) => folder.folder(t));
+  });
+
+  zip.generateAsync({ type: "blob" }).then((blob) => {
+    saveAs(blob, "Rangkaian-Folder.zip");
+  });
+}
+
+renderTemplates();
+</script>
