@@ -1,130 +1,285 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Auto Rangkai Folder Tugas</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Auto Rangkai Pro - Sidebar Layout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f1f5f9;
+      --sidebar-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      margin: 0;
+      display: flex;
+      height: 100vh; /* Full Height */
+      overflow: hidden;
+    }
+
+    /* Layout Container */
+    .app-wrapper {
+      display: grid;
+      grid-template-columns: 350px 1fr; /* Sidebar 350px, Konten sisa layar */
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Sidebar Style */
+    aside {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.02);
+    }
+
+    aside h1 { 
+      font-size: 1.5rem; 
+      color: var(--primary); 
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Main Content Style */
+    main {
+      padding: 2.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    label { font-weight: 600; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      background: #f8fafc;
+    }
+
+    textarea { height: 250px; resize: none; }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Template Grid Area */
+    .template-box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .template-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .templateItem {
+      background: #f8fafc;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px dashed var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .templateItem:hover { border-color: var(--primary); background: #fff; }
+
+    /* Buttons */
+    button {
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1rem;
+      margin-top: auto; /* Push to bottom of sidebar */
+    }
+
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+    .btn-secondary {
+      background: white;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+      padding: 8px 16px;
+    }
+
+    .btn-secondary:hover { background: var(--primary); color: white; }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: var(--danger);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 850px) {
+      .app-wrapper { grid-template-columns: 1fr; }
+      aside { height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+      body { overflow-y: auto; height: auto; }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Auto Rangkai Folder Tugas</h1>
-    <p>Nama Folder Utama:</p>
-    <input id="mainFolder" type="text" placeholder="Contoh: Semester 5" />
 
-    <p>Masukkan mata kuliah (satu per baris):</p>
+  <div class="app-wrapper">
+    <aside>
+      <h1>📁 Auto Generate Folder</h1>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Siapkan struktur folder kuliahmu dengan cepat.</p>
+      
+      <hr style="border: 0; border-top: 1px solid var(--border); width: 100%;">
 
-    <textarea id="courseInput" placeholder="Pemweb\nBasis Data\nJarkom"></textarea>
+      <div class="form-group">
+        <label>Nama Folder Utama</label>
+        <input id="mainFolder" type="text" placeholder="Contoh: Semester 6" />
+      </div>
 
-    <h3>Template Folder</h3>
-    <div id="templateList"></div>
+      <div class="form-group">
+        <label>Daftar Mata Kuliah</label>
+        <textarea id="courseInput" placeholder="Sistem Operasi&#10;Metode Penelitian&#10;Kriptografi"></textarea>
+      </div>
 
-    <button id="addTemplate">Tambah Folder Template</button>
-    <button id="generateZip">Generate ZIP</button>
+      <button id="generateZip" class="btn-primary">⚡ Unduh Struktur (.zip)</button>
+    </aside>
+
+    <main>
+      <div class="template-box">
+        <div class="template-header">
+          <div>
+            <h2 style="margin: 0; font-size: 1.2rem;">Struktur Sub-Folder</h2>
+            <p style="margin: 5px 0 0; font-size: 0.85rem; color: var(--text-muted);">Folder ini akan otomatis dibuat di dalam setiap mata kuliah.</p>
+          </div>
+          <button id="addTemplate" class="btn-secondary">+ Tambah Folder</button>
+        </div>
+
+        <div id="templateList" class="template-grid">
+          </div>
+      </div>
+
+      <div style="margin-top: auto; background: rgba(79, 70, 229, 0.05); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(79, 70, 229, 0.1);">
+        <h4 style="margin: 0 0 10px; color: var(--primary);">Informasi</h4>
+        <ul style="margin: 0; padding-left: 20px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+          <li>Gunakan <b>Enter</b> untuk memisahkan nama mata kuliah di sidebar.</li>
+          <li>Klik tombol <b>Tambah Folder</b> untuk menambah kategori (misal: "Praktikum").</li>
+          <li>Hasil akhirnya adalah satu file ZIP yang berisi seluruh folder yang sudah terstruktur.</li>
+        </ul>
+      </div>
+    </main>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    let templates = ["Tugas", "Catatan", "Materi", "UTS", "UAS"];
+
+    function renderTemplates() {
+      const container = document.getElementById("templateList");
+      container.innerHTML = "";
+      templates.forEach((t, i) => {
+        const chip = document.createElement("div");
+        chip.className = "templateItem";
+        chip.innerHTML = `
+          <span>${t}</span>
+          <button class="btn-remove" onclick="removeTemplate(${i})">&times;</button>
+        `;
+        container.appendChild(chip);
+      });
+    }
+
+    function removeTemplate(i) {
+      templates.splice(i, 1);
+      renderTemplates();
+    }
+
+    document.getElementById("addTemplate").onclick = () => {
+      const name = prompt("Masukkan nama sub-folder baru:");
+      if (name && name.trim() !== "") {
+        templates.push(name.trim());
+        renderTemplates();
+      }
+    };
+
+    document.getElementById("generateZip").onclick = () => {
+      const input = document.getElementById("courseInput").value.trim();
+      const mainFolderName = document.getElementById("mainFolder").value.trim() || "Projek-Kuliah";
+
+      if (!input) {
+        alert("Harap masukkan daftar mata kuliah terlebih dahulu di sidebar.");
+        return;
+      }
+      
+      const btn = document.getElementById("generateZip");
+      btn.innerText = "⏳ Memproses...";
+      btn.disabled = true;
+
+      const zip = new JSZip();
+      const root = zip.folder(mainFolderName);
+      
+      const courses = input.split(/\n+/);
+      courses.forEach(c => {
+        const folder = root.folder(c.trim());
+        templates.forEach(t => folder.folder(t));
+      });
+
+      zip.generateAsync({ type: "blob" }).then(blob => {
+        saveAs(blob, `${mainFolderName}.zip`);
+        btn.innerText = "⚡ Unduh Struktur (.zip)";
+        btn.disabled = false;
+      });
+    };
+
+    renderTemplates();
+  </script>
 </body>
 </html>
-
-<!-- style.css -->
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f3f3f3;
-  padding: 20px;
-}
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-textarea {
-  width: 100%;
-  height: 150px;
-  padding: 10px;
-}
-
-button {
-  margin-top: 15px;
-  margin-right: 10px;
-  padding: 10px 15px;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  background: #007bff;
-  color: white;
-}
-
-.templateItem {
-  display: flex;
-  justify-content: space-between;
-  background: #eaeaea;
-  padding: 8px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-}
-</style>
-
-<!-- script.js -->
-<script>
-let templates = ["Tugas", "Catatan", "Materi", "UTS", "UAS"]; // default template
-
-function renderTemplates() {
-  const container = document.getElementById("templateList");
-  container.innerHTML = "";
-
-  templates.forEach((t, i) => {
-    container.innerHTML += `
-      <div class="templateItem">
-        <span>${t}</span>
-        <button onclick="removeTemplate(${i})">Hapus</button>
-      </div>
-    `;
-  });
-}
-
-function removeTemplate(i) {
-  templates.splice(i, 1);
-  renderTemplates();
-}
-
-document.getElementById("addTemplate").onclick = () => {
-  const name = prompt("Nama folder template?");
-  if (name) templates.push(name);
-  renderTemplates();
-};
-
-// Auto-generate ZIP when user finishes input (on blur)
-document.getElementById("courseInput").addEventListener("blur", generateZip);
-
-function generateZip() {
-  const input = document.getElementById("courseInput").value.trim();
-  if (!input) return;
-
-  const courses = input.split(/\n+/);
-
-  const zip = new JSZip();
-  const mainName = document.getElementById("mainFolder").value.trim() || "Semester-Folder";
-  const root = zip.folder(mainName);(mainName);
-
-  courses.forEach((c) => {
-    const folder = root.folder(c);
-    templates.forEach((t) => folder.folder(t));
-  });
-
-  zip.generateAsync({ type: "blob" }).then((blob) => {
-    saveAs(blob, "Rangkaian-Folder.zip");
-  });
-}
-
-renderTemplates();
-</script>
